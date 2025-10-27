@@ -81,6 +81,29 @@ Some ISP provided modems only allow port forwarding over IPv4 or IPv6. In this c
 "subdomains": "Array of subdomains you want to update the A & where applicable, AAAA records. IMPORTANT! Only write subdomain name. Do not include the base domain name. (e.g. foo or an empty string to update the base domain)",
 "proxied": "Defaults to false. Make it true if you want CDN/SSL benefits from cloudflare. This usually disables SSH)",
 "ttl": "Defaults to 300 seconds. Longer TTLs speed up DNS lookups by increasing the chance of cached results, but a longer TTL also means that updates to your records take longer to go into effect. You can choose a TTL between 30 seconds and 1 day. For more information, see [Cloudflare's TTL documentation](https://developers.cloudflare.com/dns/manage-dns-records/reference/ttl/)",
+"ip_vendor": "Defaults to 'cloudflare'. The service to use for detecting your public IP address. See available vendors below.",
+```
+
+### 🌐 IP Detection Vendors
+
+You can choose which service to use for detecting your public IP address by setting the `ip_vendor` option in your config.json:
+
+| Vendor | Value | IPv4 Support | IPv6 Support | Privacy | Description |
+|--------|-------|--------------|--------------|---------|-------------|
+| **Cloudflare** | `cloudflare` | ✅ | ✅ | 🔒 Zero-log | Uses Cloudflare's [cdn-cgi/trace](https://www.cloudflare.com/cdn-cgi/trace) service via 1.1.1.1 and 1.0.0.1 |
+| **MyIP** | `myip` | ✅ | ✅ | No info | Uses [api.myip.com](https://api.myip.com) |
+
+#### Example configuration:
+
+```json
+{
+  "cloudflare": [...],
+  "a": true,
+  "aaaa": true,
+  "purgeUnknownRecords": false,
+  "ttl": 300,
+  "ip_vendor": "cloudflare"
+}
 ```
 
 ## 📠 Hosting multiple subdomains on the same IP?

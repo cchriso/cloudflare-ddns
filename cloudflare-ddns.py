@@ -53,12 +53,14 @@ def deleteEntries(type):
             print("🗑️ Deleted stale record " + identifier)
 
 
-def getIPs():
+def getIP_cloudflare():
+    """Get IP addresses using Cloudflare's trace service"""
     a = None
     aaaa = None
     global ipv4_enabled
     global ipv6_enabled
     global purgeUnknownRecords
+    
     if ipv4_enabled:
         try:
             a = requests.get(
@@ -97,6 +99,7 @@ def getIPs():
                     print("🧩 IPv4 not detected via 1.0.0.1. Verify your ISP or DNS provider isn't blocking Cloudflare's IPs.")
                 if purgeUnknownRecords:
                     deleteEntries("A")
+    
     if ipv6_enabled:
         try:
             aaaa = requests.get(
@@ -120,6 +123,64 @@ def getIPs():
                     print("🧩 IPv6 not detected via 1.0.0.1. Verify your ISP or DNS provider isn't blocking Cloudflare's IPs.")
                 if purgeUnknownRecords:
                     deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
+def getIP_myip():
+    """Get IP addresses using api.myip.com service"""
+    a = None
+    aaaa = None
+    global ipv4_enabled
+    global ipv6_enabled
+    global purgeUnknownRecords
+    
+    # api.myip.com returns IPv6 if you have it, otherwise IPv4
+    # So we need to check what type of IP we got
+    try:
+        response = requests.get("https://api.myip.com")
+        if response.ok:
+            data = response.json()
+            ip = data.get("ip")
+            if ip:
+                # Check if it's an IPv6 address (contains colons)
+                if ":" in ip:
+                    if ipv6_enabled:
+                        aaaa = ip
+                else:
+                    if ipv4_enabled:
+                        a = ip
+    except Exception as e:
+        global shown_ipv4_warning
+        if not shown_ipv4_warning:
+            shown_ipv4_warning = True
+            print("🧩 IP not detected via api.myip.com: " + str(e))
+        if purgeUnknownRecords:
+            if ipv4_enabled:
+                deleteEntries("A")
+            if ipv6_enabled:
+                deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
+def getIPs():
+    """Get IP addresses using the configured vendor"""
+    global ip_vendor
+    
+    # Map vendor names to functions
+    vendors = {
+        "cloudflare": getIP_cloudflare,
+        "myip": getIP_myip
+    }
+    
+    # Get the appropriate vendor function
+    vendor_func = vendors.get(ip_vendor, getIP_cloudflare)
+    
+    # Get IPs from the selected vendor
+    a, aaaa = vendor_func()
+    
+    # Format the response
     ips = {}
     if (a is not None):
         ips["ipv4"] = {
@@ -270,6 +331,7 @@ if __name__ == '__main__':
     ipv4_enabled = True
     ipv6_enabled = True
     purgeUnknownRecords = False
+    ip_vendor = "cloudflare"
 
     if sys.version_info < (3, 5):
         raise Exception("🐍 This script requires Python 3.5+")
@@ -299,6 +361,16 @@ if __name__ == '__main__':
         except:
             purgeUnknownRecords = False
             print("⚙️ No config detected for 'purgeUnknownRecords' - defaulting to False")
+        try:
+            ip_vendor = config["ip_vendor"].lower()
+            if ip_vendor not in ["cloudflare", "myip"]:
+                print("⚠️ Invalid IP vendor '" + ip_vendor + "' - defaulting to 'cloudflare'")
+                ip_vendor = "cloudflare"
+            else:
+                print("⚙️ Using IP vendor: " + ip_vendor)
+        except:
+            ip_vendor = "cloudflare"
+            print("⚙️ No config detected for 'ip_vendor' - defaulting to 'cloudflare'")
         try:
             ttl = int(config["ttl"])
         except:
