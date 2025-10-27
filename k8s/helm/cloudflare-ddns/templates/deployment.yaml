@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+  annotations:
+    checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  replicas: 1
+  revisionHistoryLimit: 5
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      containers:
+        - name: {{ .Release.Name }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: IfNotPresent
+          resources:
+            requests:
+              memory: '32Mi'
+              cpu: '50m'
+            limits:
+              memory: '50Mi'
+              cpu: '100m'
+          env:
+            - name: CONFIG_PATH
+              value: '/etc/cloudflare-ddns/'
+            - name: CF_DDNS_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-ddns-secret
+                  key: CF_DDNS_API_TOKEN
+            - name: CF_DDNS_ZONE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: cloudflare-ddns-secret
+                  key: CF_DDNS_ZONE_ID
+          volumeMounts:
+            - name: config
+              mountPath: /etc/cloudflare-ddns
+      volumes:
+        - name: config
+          configMap:
+            name: {{ .Release.Name }}-config
