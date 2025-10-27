@@ -27,9 +27,9 @@ Access your home network remotely via a custom domain name without a static IP!
 
 ## 📊 Stats
 
-| Size                                                                                                                                                                                                                           | Downloads                                                                                                                                                                                         | Discord                                                                                                                                                    |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [![cloudflare-ddns docker image size](https://img.shields.io/docker/image-size/timothyjmiller/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/timothyjmiller/cloudflare-ddns 'cloudflare-ddns docker image size') | [![Total DockerHub pulls](https://img.shields.io/docker/pulls/timothyjmiller/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/timothyjmiller/cloudflare-ddns 'Total DockerHub pulls') | [![Official Discord Server](https://img.shields.io/discord/785778163887112192?style=flat-square)](https://discord.gg/UgGmwMvNxm 'Official Discord Server') |
+| Size                                                                                                                                                                                                                           | Downloads                                                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [![cloudflare-ddns docker image size](https://img.shields.io/docker/image-size/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'cloudflare-ddns docker image size') | [![Total DockerHub pulls](https://img.shields.io/docker/pulls/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'Total DockerHub pulls') |
 
 ## 🚦 Getting Started
 
@@ -278,7 +278,7 @@ For ex:
 
 ## 🐳 Deploy with Docker Compose
 
-Pre-compiled images are available via [the official docker container on DockerHub](https://hub.docker.com/r/timothyjmiller/cloudflare-ddns).
+Pre-compiled images are available via [the official docker container on DockerHub](https://hub.docker.com/r/cchriso/cloudflare-ddns).
 
 Modify the host file path of config.json inside the volumes section of docker-compose.yml.
 
@@ -286,7 +286,7 @@ Modify the host file path of config.json inside the volumes section of docker-co
 version: '3.9'
 services:
   cloudflare-ddns:
-    image: timothyjmiller/cloudflare-ddns:latest
+    image: cchriso/cloudflare-ddns:latest
     container_name: cloudflare-ddns
     security_opt:
       - no-new-privileges:true
@@ -407,7 +407,7 @@ Recommended for production
 ### Run the locally compiled version
 
 ```bash
-docker run -d timothyjmiller/cloudflare_ddns:latest
+docker run -d cchriso/cloudflare_ddns:latest
 ```
 
 ## Supported Platforms
@@ -432,6 +432,6 @@ This Template is licensed under the GNU General Public License, version 3 (GPLv3
 
 Timothy Miller
 
-[View my GitHub profile 💡](https://github.com/timothymiller)
+[View my GitHub profile 💡](https://github.com/cchriso)
 
 [View my personal website 💻](https://timknowsbest.com)

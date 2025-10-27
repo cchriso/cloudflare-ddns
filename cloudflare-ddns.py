@@ -268,7 +268,7 @@ if __name__ == '__main__':
         except:
             ipv4_enabled = True
             ipv6_enabled = True
-            print("⚙️ Individually disable IPv4 or IPv6 with new config.json options. Read more about it here: https://github.com/timothymiller/cloudflare-ddns/blob/master/README.md")
+            print("⚙️ Individually disable IPv4 or IPv6 with new config.json options. Read more about it here: https://github.com/cchriso/cloudflare-ddns/blob/master/README.md")
         try:
             purgeUnknownRecords = config["purgeUnknownRecords"]
         except:
