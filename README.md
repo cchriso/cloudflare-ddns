@@ -92,7 +92,7 @@ You can choose which service to use for detecting your public IP address by sett
 |--------|-------|--------------|--------------|---------|-------------|------------|
 | **Cloudflare** | `cloudflare` | ✅ | ✅ | 🔒 Zero-log | Uses Cloudflare's [cdn-cgi/trace](https://www.cloudflare.com/cdn-cgi/trace) service via 1.1.1.1 and 1.0.0.1 | Not known |
 | **MyIP** | `myip` | ✅ | ✅ | No info | Uses [api.myip.com](https://api.myip.com) | No rate limit |
-| **ifconfig.co** | `ifconfig` | ✅ | ✅ | No Info | Uses [ifconfig.co/json](https://ifconfig.co/json) | 1 request/minute. No guarantee is made for requests that exceed this limit |
+| **ifconfig.co** | `ifconfig` | ✅ | ✅ | No info | Uses [ifconfig.co/json](https://ifconfig.co/json) | 1 request/minute. No guarantee is made for requests that exceed this limit |
 | **ident.me** | `identme` | ✅ | ✅ | retain little, only operational diagnostics and statistics | Uses [4.ident.me/json](https://4.ident.me/json) and [6.ident.me/json](https://6.ident.me/json) | Not known |
 
 #### Example configuration:
