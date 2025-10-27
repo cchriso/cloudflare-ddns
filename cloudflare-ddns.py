@@ -428,12 +428,14 @@ if __name__ == '__main__':
 
     if config is not None:
         try:
-            ipv4_enabled = config["a"]
-            ipv6_enabled = config["aaaa"]
+            ipv4_enabled = config.get("a")
+            ipv6_enabled = config.get("aaaa")
         except:
             ipv4_enabled = True
             ipv6_enabled = True
             print("⚙️ Individually disable IPv4 or IPv6 with new config.json options. Read more about it here: https://github.com/cchriso/cloudflare-ddns/blob/master/README.md")
+        print("⚙️ IPv4 enabled: " + str(ipv4_enabled))
+        print("⚙️ IPv6 enabled: " + str(ipv6_enabled))
         try:
             purgeUnknownRecords = config["purgeUnknownRecords"]
         except:

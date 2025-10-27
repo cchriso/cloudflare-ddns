@@ -11,6 +11,9 @@
       "proxied": false
     }
   ],
+  "purgeUnknownRecords": false,
+  "a": true,
   "aaaa": false,
+  "ttl": 300,
   "ip_vendor": "cloudflare"
 }
