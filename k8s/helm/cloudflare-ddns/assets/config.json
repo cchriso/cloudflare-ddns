@@ -1,0 +1,16 @@
+{
+  "cloudflare": [
+    {
+      "authentication": {
+          "api_token": "${CF_DDNS_API_TOKEN}"
+      },
+      "zone_id": "${CF_DDNS_ZONE_ID}",
+      "subdomains": [
+        "test","vpn"
+      ],
+      "proxied": false
+    }
+  ],
+  "aaaa": false,
+  "ip_vendor": "cloudflare"
+}
