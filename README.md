@@ -1,3 +1,7 @@
+# Notice
+This is a fork from the [original cloudflare-ddns repo](https://github.com/timothymiller/cloudflare-ddns) created by [timothymiller](https://github.com/timothymiller/)
+Here I will just implement more features as the repo seems to be not actively maintained anymore.
+
 <p align="center"><a href="https://timknowsbest.com/free-dynamic-dns" target="_blank" rel="noopener noreferrer"><img width="1024" src="feature-graphic.jpg" alt="Cloudflare DDNS"/></a></p>
 
 # 🚀 Cloudflare DDNS
@@ -428,10 +432,17 @@ docker run -d cchriso/cloudflare_ddns:latest
 
 This Template is licensed under the GNU General Public License, version 3 (GPLv3).
 
-## Author
+## Current Maintainer
+
+cchriso
+
+[GitHub profile 💡](https://github.com/cchriso)
+
+
+## Original author
 
 Timothy Miller
 
-[View my GitHub profile 💡](https://github.com/cchriso)
+[GitHub profile 💡](https://github.com/timothymiller)
 
-[View my personal website 💻](https://timknowsbest.com)
+[personal website 💻](https://timknowsbest.com)
