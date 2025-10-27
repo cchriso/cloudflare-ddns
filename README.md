@@ -92,6 +92,7 @@ You can choose which service to use for detecting your public IP address by sett
 |--------|-------|--------------|--------------|---------|-------------|
 | **Cloudflare** | `cloudflare` | ✅ | ✅ | 🔒 Zero-log | Uses Cloudflare's [cdn-cgi/trace](https://www.cloudflare.com/cdn-cgi/trace) service via 1.1.1.1 and 1.0.0.1 |
 | **MyIP** | `myip` | ✅ | ✅ | No info | Uses [api.myip.com](https://api.myip.com) |
+| **ifconfig.co** | `ifconfig` | ✅ | ✅ | No Info | Uses [ifconfig.co/json](https://ifconfig.co) |
 
 #### Example configuration:
 

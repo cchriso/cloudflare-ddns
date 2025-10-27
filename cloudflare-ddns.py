@@ -164,6 +164,43 @@ def getIP_myip():
     return a, aaaa
 
 
+def getIP_ifconfig():
+    """Get IP addresses using ifconfig.co service"""
+    a = None
+    aaaa = None
+    global ipv4_enabled
+    global ipv6_enabled
+    global purgeUnknownRecords
+    
+    # ifconfig.co returns IPv6 if you have it, otherwise IPv4
+    # So we need to check what type of IP we got
+    try:
+        response = requests.get("https://ifconfig.co/json")
+        if response.ok:
+            data = response.json()
+            ip = data.get("ip")
+            if ip:
+                # Check if it's an IPv6 address (contains colons)
+                if ":" in ip:
+                    if ipv6_enabled:
+                        aaaa = ip
+                else:
+                    if ipv4_enabled:
+                        a = ip
+    except Exception as e:
+        global shown_ipv4_warning
+        if not shown_ipv4_warning:
+            shown_ipv4_warning = True
+            print("🧩 IP not detected via ifconfig.co: " + str(e))
+        if purgeUnknownRecords:
+            if ipv4_enabled:
+                deleteEntries("A")
+            if ipv6_enabled:
+                deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
 def getIPs():
     """Get IP addresses using the configured vendor"""
     global ip_vendor
@@ -171,7 +208,8 @@ def getIPs():
     # Map vendor names to functions
     vendors = {
         "cloudflare": getIP_cloudflare,
-        "myip": getIP_myip
+        "myip": getIP_myip,
+        "ifconfig": getIP_ifconfig
     }
     
     # Get the appropriate vendor function
@@ -363,7 +401,7 @@ if __name__ == '__main__':
             print("⚙️ No config detected for 'purgeUnknownRecords' - defaulting to False")
         try:
             ip_vendor = config["ip_vendor"].lower()
-            if ip_vendor not in ["cloudflare", "myip"]:
+            if ip_vendor not in ["cloudflare", "myip", "ifconfig"]:
                 print("⚠️ Invalid IP vendor '" + ip_vendor + "' - defaulting to 'cloudflare'")
                 ip_vendor = "cloudflare"
             else:
