@@ -88,11 +88,11 @@ Some ISP provided modems only allow port forwarding over IPv4 or IPv6. In this c
 
 You can choose which service to use for detecting your public IP address by setting the `ip_vendor` option in your config.json:
 
-| Vendor | Value | IPv4 Support | IPv6 Support | Privacy | Description |
-|--------|-------|--------------|--------------|---------|-------------|
-| **Cloudflare** | `cloudflare` | ✅ | ✅ | 🔒 Zero-log | Uses Cloudflare's [cdn-cgi/trace](https://www.cloudflare.com/cdn-cgi/trace) service via 1.1.1.1 and 1.0.0.1 |
-| **MyIP** | `myip` | ✅ | ✅ | No info | Uses [api.myip.com](https://api.myip.com) |
-| **ifconfig.co** | `ifconfig` | ✅ | ✅ | No Info | Uses [ifconfig.co/json](https://ifconfig.co) |
+| Vendor | Value | IPv4 Support | IPv6 Support | Privacy | Description | Rate Limit |
+|--------|-------|--------------|--------------|---------|-------------|------------|
+| **Cloudflare** | `cloudflare` | ✅ | ✅ | 🔒 Zero-log | Uses Cloudflare's [cdn-cgi/trace](https://www.cloudflare.com/cdn-cgi/trace) service via 1.1.1.1 and 1.0.0.1 | Not known |
+| **MyIP** | `myip` | ✅ | ✅ | No info | Uses [api.myip.com](https://api.myip.com) | No rate limit |
+| **ifconfig.co** | `ifconfig` | ✅ | ✅ | No Info | Uses [ifconfig.co/json](https://ifconfig.co) | 1 request/minute. No guarantee is made for requests that exceed this limit |
 
 #### Example configuration:
 
