@@ -201,6 +201,45 @@ def getIP_ifconfig():
     return a, aaaa
 
 
+def getIP_identme():
+    """Get IP addresses using ident.me service"""
+    a = None
+    aaaa = None
+    global ipv4_enabled
+    global ipv6_enabled
+    global purgeUnknownRecords
+    
+    if ipv4_enabled:
+        try:
+            response = requests.get("https://4.ident.me/json")
+            if response.ok:
+                data = response.json()
+                a = data.get("ip")
+        except Exception as e:
+            global shown_ipv4_warning
+            if not shown_ipv4_warning:
+                shown_ipv4_warning = True
+                print("🧩 IPv4 not detected via ident.me: " + str(e))
+            if purgeUnknownRecords:
+                deleteEntries("A")
+    
+    if ipv6_enabled:
+        try:
+            response = requests.get("https://6.ident.me/json")
+            if response.ok:
+                data = response.json()
+                aaaa = data.get("ip")
+        except Exception as e:
+            global shown_ipv6_warning
+            if not shown_ipv6_warning:
+                shown_ipv6_warning = True
+                print("🧩 IPv6 not detected via ident.me: " + str(e))
+            if purgeUnknownRecords:
+                deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
 def getIPs():
     """Get IP addresses using the configured vendor"""
     global ip_vendor
@@ -209,7 +248,8 @@ def getIPs():
     vendors = {
         "cloudflare": getIP_cloudflare,
         "myip": getIP_myip,
-        "ifconfig": getIP_ifconfig
+        "ifconfig": getIP_ifconfig,
+        "identme": getIP_identme
     }
     
     # Get the appropriate vendor function
@@ -401,7 +441,7 @@ if __name__ == '__main__':
             print("⚙️ No config detected for 'purgeUnknownRecords' - defaulting to False")
         try:
             ip_vendor = config["ip_vendor"].lower()
-            if ip_vendor not in ["cloudflare", "myip", "ifconfig"]:
+            if ip_vendor not in ["cloudflare", "myip", "ifconfig", "identme"]:
                 print("⚠️ Invalid IP vendor '" + ip_vendor + "' - defaulting to 'cloudflare'")
                 ip_vendor = "cloudflare"
             else:
