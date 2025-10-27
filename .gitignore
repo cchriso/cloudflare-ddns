@@ -1,5 +1,6 @@
 # Private API keys for updating IPv4 & IPv6 addresses on Cloudflare
 local_config.json
+config.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
