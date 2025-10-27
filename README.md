@@ -31,9 +31,9 @@ Access your home network remotely via a custom domain name without a static IP!
 
 ## 📊 Stats
 
-| Size                                                                                                                                                                                                                           | Downloads                                                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [![cloudflare-ddns docker image size](https://img.shields.io/docker/image-size/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'cloudflare-ddns docker image size') | [![Total DockerHub pulls](https://img.shields.io/docker/pulls/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'Total DockerHub pulls') |
+| Size | Downloads |
+| ---- | --------- |
+| [![cloudflare-ddns docker image size](https://img.shields.io/docker/image-size/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'cloudflare-ddns docker image size') | [![Total DockerHub pulls](https://img.shields.io/docker/pulls/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'Total DockerHub pulls') | 
 
 ## 🚦 Getting Started
 
@@ -307,7 +307,7 @@ For ex:
 
 ## 🐳 Deploy with Docker Compose
 
-Pre-compiled images are available via [the official docker container on DockerHub](https://hub.docker.com/r/cchriso/cloudflare-ddns).
+Pre-compiled images are available via [the official docker container on DockerHub](https://hub.docker.com/r/cchriso/cloudflare-ddns) and also via [GitHub Container Registry](https://ghcr.io/cchriso/cloudflare-ddns).
 
 Modify the host file path of config.json inside the volumes section of docker-compose.yml.
 
@@ -315,7 +315,7 @@ Modify the host file path of config.json inside the volumes section of docker-co
 version: '3.9'
 services:
   cloudflare-ddns:
-    image: cchriso/cloudflare-ddns:latest
+    image: ghcr.io/cchriso/cloudflare-ddns:latest # please use specific version tags in production, e.g., "2.0.0"
     container_name: cloudflare-ddns
     security_opt:
       - no-new-privileges:true
@@ -407,7 +407,7 @@ Recommended for production
 ### Run the locally compiled version
 
 ```bash
-docker run -d cchriso/cloudflare_ddns:latest
+docker run -d ghcr.io/cchriso/cloudflare-ddns:latest
 ```
 
 ## Supported Platforms
