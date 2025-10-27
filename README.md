@@ -31,9 +31,9 @@ Access your home network remotely via a custom domain name without a static IP!
 
 ## 📊 Stats
 
-| Size                                                                                                                                                                                                                           | Downloads                                                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [![cloudflare-ddns docker image size](https://img.shields.io/docker/image-size/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'cloudflare-ddns docker image size') | [![Total DockerHub pulls](https://img.shields.io/docker/pulls/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'Total DockerHub pulls') |
+| Size | Downloads |
+| ---- | --------- |
+| [![cloudflare-ddns docker image size](https://img.shields.io/docker/image-size/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'cloudflare-ddns docker image size') | [![Total DockerHub pulls](https://img.shields.io/docker/pulls/cchriso/cloudflare-ddns?style=flat-square)](https://hub.docker.com/r/cchriso/cloudflare-ddns 'Total DockerHub pulls') | 
 
 ## 🚦 Getting Started
 
@@ -81,6 +81,31 @@ Some ISP provided modems only allow port forwarding over IPv4 or IPv6. In this c
 "subdomains": "Array of subdomains you want to update the A & where applicable, AAAA records. IMPORTANT! Only write subdomain name. Do not include the base domain name. (e.g. foo or an empty string to update the base domain)",
 "proxied": "Defaults to false. Make it true if you want CDN/SSL benefits from cloudflare. This usually disables SSH)",
 "ttl": "Defaults to 300 seconds. Longer TTLs speed up DNS lookups by increasing the chance of cached results, but a longer TTL also means that updates to your records take longer to go into effect. You can choose a TTL between 30 seconds and 1 day. For more information, see [Cloudflare's TTL documentation](https://developers.cloudflare.com/dns/manage-dns-records/reference/ttl/)",
+"ip_vendor": "Defaults to 'cloudflare'. The service to use for detecting your public IP address. See available vendors below.",
+```
+
+### 🌐 IP Detection Vendors
+
+You can choose which service to use for detecting your public IP address by setting the `ip_vendor` option in your config.json:
+
+| Vendor | Value | IPv4 Support | IPv6 Support | Privacy | Description | Rate Limit |
+|--------|-------|--------------|--------------|---------|-------------|------------|
+| **Cloudflare** | `cloudflare` | ✅ | ✅ | 🔒 Zero-log | Uses Cloudflare's [cdn-cgi/trace](https://www.cloudflare.com/cdn-cgi/trace) service via 1.1.1.1 and 1.0.0.1 | Not known |
+| **MyIP** | `myip` | ✅ | ✅ | No info | Uses [api.myip.com](https://api.myip.com) | No rate limit |
+| **ifconfig.co** | `ifconfig` | ✅ | ✅ | No info | Uses [ifconfig.co/json](https://ifconfig.co/json) | 1 request/minute. No guarantee is made for requests that exceed this limit |
+| **ident.me** | `identme` | ✅ | ✅ | retain little, only operational diagnostics and statistics | Uses [4.ident.me/json](https://4.ident.me/json) and [6.ident.me/json](https://6.ident.me/json) | Not known |
+
+#### Example configuration:
+
+```json
+{
+  "cloudflare": [...],
+  "a": true,
+  "aaaa": true,
+  "purgeUnknownRecords": false,
+  "ttl": 300,
+  "ip_vendor": "cloudflare"
+}
 ```
 
 ## 📠 Hosting multiple subdomains on the same IP?
@@ -282,7 +307,7 @@ For ex:
 
 ## 🐳 Deploy with Docker Compose
 
-Pre-compiled images are available via [the official docker container on DockerHub](https://hub.docker.com/r/cchriso/cloudflare-ddns).
+Pre-compiled images are available via [the official docker container on DockerHub](https://hub.docker.com/r/cchriso/cloudflare-ddns) and also via [GitHub Container Registry](https://ghcr.io/cchriso/cloudflare-ddns).
 
 Modify the host file path of config.json inside the volumes section of docker-compose.yml.
 
@@ -290,7 +315,7 @@ Modify the host file path of config.json inside the volumes section of docker-co
 version: '3.9'
 services:
   cloudflare-ddns:
-    image: cchriso/cloudflare-ddns:latest
+    image: ghcr.io/cchriso/cloudflare-ddns:latest # please use specific version tags in production, e.g., "2.0.0"
     container_name: cloudflare-ddns
     security_opt:
       - no-new-privileges:true
@@ -382,7 +407,7 @@ Recommended for production
 ### Run the locally compiled version
 
 ```bash
-docker run -d cchriso/cloudflare_ddns:latest
+docker run -d ghcr.io/cchriso/cloudflare-ddns:latest
 ```
 
 ## Supported Platforms

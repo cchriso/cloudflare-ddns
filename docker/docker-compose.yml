@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   cloudflare-ddns:
-    image: cchriso/cloudflare-ddns:latest
+    image: ghcr.io/cchriso/cloudflare-ddns:latest # please use specific version tags in production, e.g., "2.0.0"
     container_name: cloudflare-ddns
     security_opt:
       - no-new-privileges:true

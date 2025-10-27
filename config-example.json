@@ -24,5 +24,6 @@
   "a": true,
   "aaaa": true,
   "purgeUnknownRecords": false,
-  "ttl": 300
+  "ttl": 300,
+  "ip_vendor": "cloudflare"
 }

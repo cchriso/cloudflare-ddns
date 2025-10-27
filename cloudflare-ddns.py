@@ -6,7 +6,7 @@
 #                A small, 🕵️ privacy centric, and ⚡
 #                lightning fast multi-architecture Docker image for self hosting projects.
 
-__version__ = "1.0.2"
+__version__ = "2.0.0"
 
 from string import Template
 
@@ -53,25 +53,53 @@ def deleteEntries(type):
             print("🗑️ Deleted stale record " + identifier)
 
 
-def getIPs():
+def getIP_cloudflare():
+    """Get IP addresses using Cloudflare's trace service"""
     a = None
     aaaa = None
     global ipv4_enabled
     global ipv6_enabled
     global purgeUnknownRecords
+    
     if ipv4_enabled:
         try:
             a = requests.get(
-                "https://cloudflare.com/cdn-cgi/trace").text.split("\n")
+                "https://1.1.1.1/cdn-cgi/trace").text.split("\n")
             a.pop()
             a = dict(s.split("=") for s in a)["ip"]
+            # Check if we got a Cloudflare proxy IP instead of actual public IP
+            if a.startswith("104.18."):
+                print("🔄 Detected Cloudflare proxy IP, trying cloudflare.com instead")
+                a = requests.get(
+                    "https://cloudflare.com/cdn-cgi/trace").text.split("\n")
+                a.pop()
+                a = dict(s.split("=") for s in a)["ip"]
         except Exception:
             global shown_ipv4_warning
             if not shown_ipv4_warning:
                 shown_ipv4_warning = True
-                print("🧩 IPv4 not detected via cloudflare.com")
-            if purgeUnknownRecords:
-                deleteEntries("A")
+                print("🧩 IPv4 not detected via 1.1.1.1, trying 1.0.0.1")
+            # Try secondary IP check
+            try:
+                a = requests.get(
+                    "https://1.0.0.1/cdn-cgi/trace").text.split("\n")
+                a.pop()
+                a = dict(s.split("=") for s in a)["ip"]
+                # Check if we got a Cloudflare proxy IP instead of actual public IP
+                if a.startswith("104.18."):
+                    print("🔄 Detected Cloudflare proxy IP, trying cloudflare.com instead")
+                    a = requests.get(
+                        "https://cloudflare.com/cdn-cgi/trace").text.split("\n")
+                    a.pop()
+                    a = dict(s.split("=") for s in a)["ip"]
+            except Exception:
+                global shown_ipv4_warning_secondary
+                if not shown_ipv4_warning_secondary:
+                    shown_ipv4_warning_secondary = True
+                    print("🧩 IPv4 not detected via 1.0.0.1. Verify your ISP or DNS provider isn't blocking Cloudflare's IPs.")
+                if purgeUnknownRecords:
+                    deleteEntries("A")
+    
     if ipv6_enabled:
         try:
             aaaa = requests.get(
@@ -95,6 +123,142 @@ def getIPs():
                     print("🧩 IPv6 not detected via 1.0.0.1. Verify your ISP or DNS provider isn't blocking Cloudflare's IPs.")
                 if purgeUnknownRecords:
                     deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
+def getIP_myip():
+    """Get IP addresses using api.myip.com service"""
+    a = None
+    aaaa = None
+    global ipv4_enabled
+    global ipv6_enabled
+    global purgeUnknownRecords
+    
+    # api.myip.com returns IPv6 if you have it, otherwise IPv4
+    # So we need to check what type of IP we got
+    try:
+        response = requests.get("https://api.myip.com")
+        if response.ok:
+            data = response.json()
+            ip = data.get("ip")
+            if ip:
+                # Check if it's an IPv6 address (contains colons)
+                if ":" in ip:
+                    if ipv6_enabled:
+                        aaaa = ip
+                else:
+                    if ipv4_enabled:
+                        a = ip
+    except Exception as e:
+        global shown_ipv4_warning
+        if not shown_ipv4_warning:
+            shown_ipv4_warning = True
+            print("🧩 IP not detected via api.myip.com: " + str(e))
+        if purgeUnknownRecords:
+            if ipv4_enabled:
+                deleteEntries("A")
+            if ipv6_enabled:
+                deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
+def getIP_ifconfig():
+    """Get IP addresses using ifconfig.co service"""
+    a = None
+    aaaa = None
+    global ipv4_enabled
+    global ipv6_enabled
+    global purgeUnknownRecords
+    
+    # ifconfig.co returns IPv6 if you have it, otherwise IPv4
+    # So we need to check what type of IP we got
+    try:
+        response = requests.get("https://ifconfig.co/json")
+        if response.ok:
+            data = response.json()
+            ip = data.get("ip")
+            if ip:
+                # Check if it's an IPv6 address (contains colons)
+                if ":" in ip:
+                    if ipv6_enabled:
+                        aaaa = ip
+                else:
+                    if ipv4_enabled:
+                        a = ip
+    except Exception as e:
+        global shown_ipv4_warning
+        if not shown_ipv4_warning:
+            shown_ipv4_warning = True
+            print("🧩 IP not detected via ifconfig.co: " + str(e))
+        if purgeUnknownRecords:
+            if ipv4_enabled:
+                deleteEntries("A")
+            if ipv6_enabled:
+                deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
+def getIP_identme():
+    """Get IP addresses using ident.me service"""
+    a = None
+    aaaa = None
+    global ipv4_enabled
+    global ipv6_enabled
+    global purgeUnknownRecords
+    
+    if ipv4_enabled:
+        try:
+            response = requests.get("https://4.ident.me/json")
+            if response.ok:
+                data = response.json()
+                a = data.get("ip")
+        except Exception as e:
+            global shown_ipv4_warning
+            if not shown_ipv4_warning:
+                shown_ipv4_warning = True
+                print("🧩 IPv4 not detected via ident.me: " + str(e))
+            if purgeUnknownRecords:
+                deleteEntries("A")
+    
+    if ipv6_enabled:
+        try:
+            response = requests.get("https://6.ident.me/json")
+            if response.ok:
+                data = response.json()
+                aaaa = data.get("ip")
+        except Exception as e:
+            global shown_ipv6_warning
+            if not shown_ipv6_warning:
+                shown_ipv6_warning = True
+                print("🧩 IPv6 not detected via ident.me: " + str(e))
+            if purgeUnknownRecords:
+                deleteEntries("AAAA")
+    
+    return a, aaaa
+
+
+def getIPs():
+    """Get IP addresses using the configured vendor"""
+    global ip_vendor
+    
+    # Map vendor names to functions
+    vendors = {
+        "cloudflare": getIP_cloudflare,
+        "myip": getIP_myip,
+        "ifconfig": getIP_ifconfig,
+        "identme": getIP_identme
+    }
+    
+    # Get the appropriate vendor function
+    vendor_func = vendors.get(ip_vendor, getIP_cloudflare)
+    
+    # Get IPs from the selected vendor
+    a, aaaa = vendor_func()
+    
+    # Format the response
     ips = {}
     if (a is not None):
         ips["ipv4"] = {
@@ -245,6 +409,7 @@ if __name__ == '__main__':
     ipv4_enabled = True
     ipv6_enabled = True
     purgeUnknownRecords = False
+    ip_vendor = "cloudflare"
 
     if sys.version_info < (3, 5):
         raise Exception("🐍 This script requires Python 3.5+")
@@ -263,17 +428,29 @@ if __name__ == '__main__':
 
     if config is not None:
         try:
-            ipv4_enabled = config["a"]
-            ipv6_enabled = config["aaaa"]
+            ipv4_enabled = config.get("a")
+            ipv6_enabled = config.get("aaaa")
         except:
             ipv4_enabled = True
             ipv6_enabled = True
             print("⚙️ Individually disable IPv4 or IPv6 with new config.json options. Read more about it here: https://github.com/cchriso/cloudflare-ddns/blob/master/README.md")
+        print("⚙️ IPv4 enabled: " + str(ipv4_enabled))
+        print("⚙️ IPv6 enabled: " + str(ipv6_enabled))
         try:
             purgeUnknownRecords = config["purgeUnknownRecords"]
         except:
             purgeUnknownRecords = False
             print("⚙️ No config detected for 'purgeUnknownRecords' - defaulting to False")
+        try:
+            ip_vendor = config["ip_vendor"].lower()
+            if ip_vendor not in ["cloudflare", "myip", "ifconfig", "identme"]:
+                print("⚠️ Invalid IP vendor '" + ip_vendor + "' - defaulting to 'cloudflare'")
+                ip_vendor = "cloudflare"
+            else:
+                print("⚙️ Using IP vendor: " + ip_vendor)
+        except:
+            ip_vendor = "cloudflare"
+            print("⚙️ No config detected for 'ip_vendor' - defaulting to 'cloudflare'")
         try:
             ttl = int(config["ttl"])
         except:

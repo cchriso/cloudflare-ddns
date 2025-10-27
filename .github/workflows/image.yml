@@ -41,6 +41,33 @@ jobs:
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
+      
+      - name: Extract version from Python file
+        shell: bash
+        run: echo "##[set-output name=version;]$(grep -oP '__version__ = "\K[^"]+' cloudflare-ddns.py)"
+        id: extract_version
+      
+      - name: Check if version tag already exists
+        shell: bash
+        run: |
+          VERSION="${{ steps.extract_version.outputs.version }}"
+          echo "Checking if version $VERSION already exists..."
+          
+          # Check Docker Hub
+          DOCKERHUB_EXISTS=$(curl -s "https://hub.docker.com/v2/repositories/cchriso/cloudflare-ddns/tags/$VERSION" | grep -o '"name"' || echo "")
+          
+          # Check GitHub Container Registry
+          GHCR_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://ghcr.io/v2/cchriso/cloudflare-ddns/manifests/$VERSION")
+          
+          if [ ! -z "$DOCKERHUB_EXISTS" ] || [ "$GHCR_STATUS" = "200" ]; then
+            echo "::error::Version $VERSION already exists in one or more registries. Please update the version in cloudflare-ddns.py before merging."
+            exit 1
+          else
+            echo "Version $VERSION does not exist. Proceeding with build..."
+          fi
+        id: check_version
+      
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
@@ -53,6 +80,7 @@ jobs:
             latest=false
           tags: |
             type=raw,enable=${{ steps.extract_branch.outputs.branch == 'master' }},value=latest
+            type=raw,enable=${{ steps.extract_branch.outputs.branch == 'master' }},value=${{ steps.extract_version.outputs.version }}
             type=schedule
             type=ref,event=pr
             
